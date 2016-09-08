@@ -22,19 +22,11 @@ class IndexController extends AbstractActionController
         return new ViewModel(array('beers' => $beers));
     }
 
-    public function createAction()
-    {
-        $form = $this->getServiceLocator()->get('Application\Form\Beer');
-        $form->setAttribute('action', '/insert');
-        $form->get('send')->setAttribute('value', 'Salvar');
-
-        return new ViewModel(['beerForm' => $form]);
-    }
-
     public function insertAction()
     {
         $form = $this->getServiceLocator()->get('Application\Form\Beer');
         $form->setAttribute('action', '/insert');
+        $form->get('send')->setAttribute('value', 'Salvar');
         $tableGateway = $this->getServiceLocator()->get('Application\Model\BeerTableGateway');
         $beer = new \Application\Model\Beer;
         $request = $this->getRequest();
@@ -42,17 +34,33 @@ class IndexController extends AbstractActionController
             $form->setInputFilter($beer->getInputFilter());
             $form->setData($request->getPost());
             if ($form->isValid()) {
-                /* pega os dados validados e filtrados */
                 $data = $form->getData();
-                /* preenche os dados do objeto Post com os dados do formulário*/
                 $beer->exchangeArray($data);
-                /* salva o novo post*/
                 $tableGateway->save($beer);
-                /* redireciona para a página inicial que mostra todos os posts*/
                 return $this->redirect()->toUrl('/');
             }
         }
 
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if ($id > 0) { 
+            $post = $tableGateway->get($id);
+            $form->bind($post);
+            $form->get('send')->setAttribute('value', 'Editar');
+        }
+
         return new ViewModel(['beerForm' => $form]);
+    }
+
+    public function deleteAction()
+    {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if ($id == 0) {
+            throw new \Exception("O código é obrigatório");
+        }
+
+        $tableGateway = $this->getServiceLocator()->get('Application\Model\BeerTableGateway');
+        $tableGateway->delete($id);
+        
+        return $this->redirect()->toUrl('/');
     }
 }
