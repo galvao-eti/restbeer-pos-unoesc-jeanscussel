@@ -25,7 +25,6 @@ class Beer extends Form
             ],
             'type'  => 'Text',
         ]);
-
          $this->add([
             'name' => 'img',
             'options' => [
@@ -33,7 +32,6 @@ class Beer extends Form
             ],
             'type'  => 'Text',
         ]);
-
         $this->add([
             'name' => 'send',
             'type'  => 'Submit',
@@ -41,7 +39,6 @@ class Beer extends Form
                 'value' => 'Submit',
             ],
         ]);
-
         $this->setAttribute('action', '/save');
         $this->setAttribute('method', 'post');
     }
